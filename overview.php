@@ -1,0 +1,163 @@
+<?
+	//MySQLi connection
+	$mysqli = new mysqli('mysql7.000webhost.com', 'a7326768_lolmeta', 'lolmeta42', 'a7326768_lolmeta');
+	if($mysqli->connect_errno > 0){
+	   	die('Unable to connect to database [' . $mysqli->connect_error . ']');
+	}
+
+	function time_elapsed_string($ptime)
+	{
+	    $etime = time() - $ptime;
+
+	    if ($etime < 1)
+	    {
+	        return '0 seconds';
+	    }
+
+	    $a = array( 365 * 24 * 60 * 60  =>  'year',
+	                 30 * 24 * 60 * 60  =>  'month',
+	                      24 * 60 * 60  =>  'day',
+	                           60 * 60  =>  'hour',
+	                                60  =>  'minute',
+	                                 1  =>  'second'
+	                );
+	    $a_plural = array( 'year'   => 'years',
+	                       'month'  => 'months',
+	                       'day'    => 'days',
+	                       'hour'   => 'hours',
+	                       'minute' => 'minutes',
+	                       'second' => 'seconds'
+	                );
+
+	    foreach ($a as $secs => $str)
+	    {
+	        $d = $etime / $secs;
+	        if ($d >= 1)
+	        {
+	            $r = round($d);
+	            return $r . ' ' . ($r > 1 ? $a_plural[$str] : $str) . ' ago';
+	        }
+	    }
+	}
+
+	function unixTimeToSeconds($in)
+	{
+		return round($in/1000);
+	}
+
+	function champIdToChampName($in)
+	{
+		$json = file_get_contents('http://ddragon.leagueoflegends.com/cdn/5.15.1/data/en_US/champion.json');
+		$obj = json_decode($json, true);
+		foreach ($obj[data] as $key => $value) {
+			if($value[key]==$in){
+				return $value[id];
+			}
+		}
+	}
+?>
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>FourGoodOneBadGuy</title>
+	<link rel="stylesheet" type="text/css" href="styles.css" />
+
+	<link rel="shortcut icon" href="/lurchi/icons/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/lurchi/icons/favicon.ico" type="image/x-icon">
+
+</head>
+<body>
+	<?
+		$summonerId = array(
+		    "biberman"   => "40023404",
+		    "lupusius" => "38527580",
+			"lurchi09" => "40105796",
+			"oglie"  => "39999855",
+			"tomotx"  => "41739529",
+		    "viper6" => "38598275"
+		);
+
+		echo '	<table><tr>';
+
+		foreach ($summonerId as $key2 => $value2) {
+			$summoner = array();
+			if($result = $mysqli->query("SELECT * FROM summonerInfo WHERE summonerID=$value2")){
+				while ($row = $result->fetch_assoc()) {
+					$summoner = $row;
+				}
+				unset($row);
+	        	$result->close();
+	        }
+			$history = array();
+			if($result = $mysqli->query("SELECT * FROM matchHistory WHERE summonerID=$value2 AND queueType='RANKED_SOLO_5x5' ORDER BY creation DESC LIMIT 10")){
+				while ($row = $result->fetch_assoc()) {
+					$history[] = $row;
+				}
+				unset($row);
+	        	$result->close();
+	        }
+
+			echo '<td>	
+					<table>
+						<tr>
+							<td colspan="3">
+								<center><b>'.$summoner[name].'</b></center>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<img src="/icons/'.$summoner[league].'.png" width="80" hight="80">
+							</td>
+							<td>
+								<img src="/icons/'.$summoner[division].'.png" width="40" hight="40">
+							</td>
+							<td>
+								'.$summoner[points].'
+							</td>
+						</tr>
+						<tr>
+							<td colspan="3">
+			';
+			foreach ($history as $key => $value) {
+				echo '		<table bgcolor="'.($value[win] == '1' ? "green" : "FireBrick").'" width="200px">
+								<tr>
+									<td colspan="3">
+										'.time_elapsed_string(unixTimeToSeconds($value[creation])+$value[duration]).'
+									</td>
+								</tr>
+								<tr>
+									<td rowspan=2>
+										<img src="http://ddragon.leagueoflegends.com/cdn/5.15.1/img/champion/'.champIdToChampName($value[champ]).'.png" width="45" hight="45">
+									</td>
+									<td rowspan=2>
+										<img src="/icons/lane_'.$value[lane].'.png" width="45" hight="45">
+									</td>
+									<td>
+										<center>'.gmdate("H:i:s", $value[duration]).'</center>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<center><b><font color="white">'.$value[kills].' </font>|<font color="white"> '.$value[deaths].' </font>|<font color="white"> '.$value[assists].'</font></b></center>
+									</td>
+								</tr>
+							</table>
+				';
+			}
+			echo '			</td>
+						</tr>
+					</table>
+				</td>
+			';
+		}
+		echo '</tr></table>';
+
+		//MySQLi disconnection
+		$mysqli->close();
+	?>
+</body>
+</html>
