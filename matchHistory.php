@@ -34,21 +34,23 @@
 
 		//matchHistory
 		foreach ($obj[matches] as $key2 => $value2) {
-			if ($value2[queueType]=="RANKED_SOLO_5x5" && !(in_array($value2[matchId], $history))) {
+			if (!(in_array($value2[matchId], $history))) {
 				$query = '	INSERT INTO matchHistory (
-								summonerID, 
-								matchID, 
-								creation, 
-								champ, 
-								lane, 
-								duration, 
-								kills, 
-								deaths, 
-								assists, 
+								summonerID,
+								matchID,
+								queueType,
+								creation,
+								champ,
+								lane,
+								duration,
+								kills,
+								deaths,
+								assists,
 								win)
 							VALUES (
 								'.$value.', 
-								'.$value2[matchId].', 
+								'.$value2[matchId].',
+								"'.$value2[queueType].'",
 								'.$value2[matchCreation].', 
 								'.$value2[participants][0][championId].', 
 								"'.$value2[participants][0][timeline][lane].'", 
