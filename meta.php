@@ -1,6 +1,6 @@
 <?
 	//MySQLi connection
-	$mysqli = new mysqli('mysql7.000webhost.com', 'a7326768_lolmeta', 'lolmeta42', 'a7326768_lolmeta');
+	$mysqli = new mysqli('localhost', 'rclsirzj_lolmeta', 'LoLMeta42', 'rclsirzj_lolmeta');
 	if($mysqli->connect_errno > 0){
 	   	die('Unable to connect to database [' . $mysqli->connect_error . ']');
 	}
@@ -22,7 +22,7 @@
 
 	preg_match_all('/"key"."(?P<name>\w+)","role"."(?P<role>\w+)".*?"overallPosition".(?P<rank>\d+),/', $output, $matches, PREG_SET_ORDER);
 	foreach ($matches as $key => $value){
-		if($value[rank]<11){
+		if($value['rank']<11){
 			$query = "	INSERT INTO champs
 						(name, role, rank)
 						VALUES 
@@ -45,7 +45,7 @@
 	        foreach ($matches as $key => $value){
 	        	if($result2 = $mysqli->query("SELECT * FROM champs WHERE role='$row[role]' AND name='$value[counter]'")){
 	        		$row2 = $result2->fetch_assoc();
-	        		if($row2[index]>0){
+	        		if($row2['index']>0){
 						$query = "	INSERT INTO counters
 									(champ, counter, rating)
 									VALUES 
