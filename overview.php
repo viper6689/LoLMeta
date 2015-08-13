@@ -1,6 +1,6 @@
 <?
 	//MySQLi connection
-	$mysqli = new mysqli('mysql7.000webhost.com', 'a7326768_lolmeta', 'lolmeta42', 'a7326768_lolmeta');
+	$mysqli = new mysqli('localhost', 'rclsirzj_lolmeta', 'LoLMeta42', 'rclsirzj_lolmeta');
 	if($mysqli->connect_errno > 0){
 	   	die('Unable to connect to database [' . $mysqli->connect_error . ']');
 	}
@@ -49,9 +49,9 @@
 	{
 		$json = file_get_contents('http://ddragon.leagueoflegends.com/cdn/5.15.1/data/en_US/champion.json');
 		$obj = json_decode($json, true);
-		foreach ($obj[data] as $key => $value) {
-			if($value[key]==$in){
-				return $value[id];
+		foreach ($obj['data'] as $key => $value) {
+			if($value['key']==$in){
+				return $value['id'];
 			}
 		}
 	}
@@ -71,93 +71,106 @@
 
 </head>
 <body>
-	<?
-		$summonerId = array(
-		    "biberman"   => "40023404",
-		    "lupusius" => "38527580",
-			"lurchi09" => "40105796",
-			"oglie"  => "39999855",
-			"tomotx"  => "41739529",
-		    "viper6" => "38598275"
-		);
+	<div id="misc">
+		<a href="/index.php">Meta</a>
+	</div>
+	<div id="summonerOverview">
+		<?
+			$summonerId = array(
+			    "biberman"   => "40023404",
+			    "lupusius" => "38527580",
+				"lurchi09" => "40105796",
+				"oglie"  => "39999855",
+				"tomotx"  => "41739529",
+			    "viper6" => "38598275"
+			);
 
-		echo '	<table><tr>';
+			echo '	<table><tr>';
 
-		foreach ($summonerId as $key2 => $value2) {
-			$summoner = array();
-			if($result = $mysqli->query("SELECT * FROM summonerInfo WHERE summonerID=$value2")){
-				while ($row = $result->fetch_assoc()) {
-					$summoner = $row;
+			foreach ($summonerId as $key2 => $value2) {
+				$summoner = array();
+				if($result = $mysqli->query("SELECT * FROM summonerInfo WHERE summonerID=$value2")){
+					while ($row = $result->fetch_assoc()) {
+						$summoner = $row;
+					}
+					unset($row);
+		        	$result->close();
+		        }
+				$history = array();
+				if($result = $mysqli->query("SELECT * FROM matchHistory WHERE summonerID=$value2 AND queueType='RANKED_SOLO_5x5' ORDER BY creation DESC LIMIT 10")){
+					while ($row = $result->fetch_assoc()) {
+						$history[] = $row;
+					}
+					unset($row);
+		        	$result->close();
+		        }
+		        $mainRole['lane'] = "UNKNOWN";
+		        if($result = $mysqli->query("SELECT lane, COUNT(lane) AS LaneCount FROM matchHistory WHERE summonerID=$value2 AND queueType='RANKED_SOLO_5x5' GROUP BY lane ORDER BY LaneCount DESC LIMIT 1")){
+		        	if (mysqli_num_rows($result)>0) {
+		        		$mainRole = $result->fetch_assoc();
+		        	}
+					unset($row);
+		        	$result->close();
+		        }
+
+				echo '<td>	
+						<table>
+							<tr>
+								<td colspan="3">
+									<center><b>'.$summoner['name'].'</b><img src="/icons/main_'.$mainRole['lane'].'.png"></center>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<img src="/icons/'.$summoner['league'].'.png" width="80" hight="80">
+								</td>
+								<td>
+									<img src="/icons/'.$summoner['division'].'.png" width="40" hight="40">
+								</td>
+								<td>
+									'.$summoner['points'].'
+								</td>
+							</tr>
+							<tr>
+								<td colspan="3">
+				';
+				foreach ($history as $key => $value) {
+					echo '		<table bgcolor="'.($value['win'] == '1' ? "green" : "FireBrick").'" width="200px">
+									<tr>
+										<td colspan="3">
+											'.time_elapsed_string(unixTimeToSeconds($value['creation'])+$value['duration']).'
+										</td>
+									</tr>
+									<tr>
+										<td rowspan=2>
+											<img src="http://ddragon.leagueoflegends.com/cdn/5.15.1/img/champion/'.champIdToChampName($value['champ']).'.png" width="45" hight="45">
+										</td>
+										<td rowspan=2>
+											<img src="/icons/lane_'.$value['lane'].'.png" width="45" hight="45">
+										</td>
+										<td>
+											<center>'.gmdate("H:i:s", $value['duration']).'</center>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<center><b><font color="white">'.$value['kills'].' </font>|<font color="white"> '.$value['deaths'].' </font>|<font color="white"> '.$value['assists'].'</font></b></center>
+										</td>
+									</tr>
+								</table>
+					';
 				}
-				unset($row);
-	        	$result->close();
-	        }
-			$history = array();
-			if($result = $mysqli->query("SELECT * FROM matchHistory WHERE summonerID=$value2 AND queueType='RANKED_SOLO_5x5' ORDER BY creation DESC LIMIT 10")){
-				while ($row = $result->fetch_assoc()) {
-					$history[] = $row;
-				}
-				unset($row);
-	        	$result->close();
-	        }
-
-			echo '<td>	
-					<table>
-						<tr>
-							<td colspan="3">
-								<center><b>'.$summoner[name].'</b></center>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<img src="/icons/'.$summoner[league].'.png" width="80" hight="80">
-							</td>
-							<td>
-								<img src="/icons/'.$summoner[division].'.png" width="40" hight="40">
-							</td>
-							<td>
-								'.$summoner[points].'
-							</td>
-						</tr>
-						<tr>
-							<td colspan="3">
-			';
-			foreach ($history as $key => $value) {
-				echo '		<table bgcolor="'.($value[win] == '1' ? "green" : "FireBrick").'" width="200px">
-								<tr>
-									<td colspan="3">
-										'.time_elapsed_string(unixTimeToSeconds($value[creation])+$value[duration]).'
-									</td>
-								</tr>
-								<tr>
-									<td rowspan=2>
-										<img src="http://ddragon.leagueoflegends.com/cdn/5.15.1/img/champion/'.champIdToChampName($value[champ]).'.png" width="45" hight="45">
-									</td>
-									<td rowspan=2>
-										<img src="/icons/lane_'.$value[lane].'.png" width="45" hight="45">
-									</td>
-									<td>
-										<center>'.gmdate("H:i:s", $value[duration]).'</center>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<center><b><font color="white">'.$value[kills].' </font>|<font color="white"> '.$value[deaths].' </font>|<font color="white"> '.$value[assists].'</font></b></center>
-									</td>
-								</tr>
-							</table>
+				echo '			</td>
+							</tr>
+						</table>
+					</td>
 				';
 			}
-			echo '			</td>
-						</tr>
-					</table>
-				</td>
-			';
-		}
-		echo '</tr></table>';
+			echo '</tr></table>';
 
-		//MySQLi disconnection
-		$mysqli->close();
-	?>
+			//MySQLi disconnection
+			$mysqli->close();
+		?>
+	</div>
 </body>
 </html>
