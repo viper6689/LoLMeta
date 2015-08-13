@@ -40,11 +40,11 @@
 							'.$obj[$value][0][entries][0][leaguePoints].')';
 */
 		$query = '	UPDATE summonerInfo
-					SET name 		= "'.$obj[$value][0][entries][0][playerOrTeamName].'",
-						league 		= "'.$obj[$value][0][tier].'",
-						division	= "'.$obj[$value][0][entries][0][division].'",
-						points		= '.$obj[$value][0][entries][0][leaguePoints].'
-					WHERE summonerID = '.$obj[$value][0][entries][0][playerOrTeamId];
+					SET name 		= "'.$obj[$value][0]['entries'][0]['playerOrTeamName'].'",
+						league 		= "'.$obj[$value][0]['tier'].'",
+						division	= "'.$obj[$value][0]['entries'][0]['division'].'",
+						points		= '.$obj[$value][0]['entries'][0]['leaguePoints'].'
+					WHERE summonerID = '.$obj[$value][0]['entries'][0]['playerOrTeamId'];
 
 		$mysqli->query($query);
 		unset($query);
