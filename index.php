@@ -1,6 +1,6 @@
 <?	
 	//MySQLi connection
-	$mysqli = new mysqli('mysql7.000webhost.com', 'a7326768_lolmeta', 'lolmeta42', 'a7326768_lolmeta');
+	$mysqli = new mysqli('localhost', 'rclsirzj_lolmeta', 'LoLMeta42', 'rclsirzj_lolmeta');
 	if($mysqli->connect_errno > 0){
 	   	die('Unable to connect to database [' . $mysqli->connect_error . ']');
 	}
@@ -16,6 +16,7 @@
 </head>
 <body>
 	<div id="misc">
+		<a href="/overview.php">Overview</a><br />
 		<a href="http://www.mobafire.com/profile/vercetty-627507/content/builds" target="_blank">Builds</a>
 	</div>
 
@@ -32,20 +33,20 @@
 			        }
 
 					foreach ($roles as $key => $value) {
-						switch ($value[role]) {
-										    case Top:
+						switch ($value['role']) {
+										    case 'Top':
 										        $color = "sienna";
 										        break;
-										    case Jungle:
+										    case 'Jungle':
 										        $color = "green";
 										        break;
-										    case Middle:
+										    case 'Middle':
 										        $color = "royalblue";
 										        break;
-										    case ADC:
+										    case 'ADC':
 										        $color = "darkred";
 										        break;
-										    case Support:
+										    case 'Support':
 										        $color = "goldenrod";
 										        break;
 										};
@@ -90,20 +91,20 @@
 				<?
 					$roles = array(array("role" => "Top"), array("role" =>  "Middle"));
 					foreach ($roles as $key => $value) {
-						switch ($value[role]) {
-						    case Top:
+						switch ($value['role']) {
+						    case 'Top':
 						        $color = "sienna";
 						        break;
-						    case Jungle:
+						    case 'Jungle':
 						        $color = "green";
 						        break;
-						    case Middle:
+						    case 'Middle':
 						        $color = "royalblue";
 						        break;
-						    case ADC:
+						    case 'ADC':
 						        $color = "darkred";
 						        break;
-						    case Support:
+						    case 'Support':
 						        $color = "goldenrod";
 						        break;
 						};
@@ -133,7 +134,7 @@
 				        }
 
 				        foreach ($counters as $key2 => $value2) {
-				        	$champs[$value2[champname]] = $value2[champname];
+				        	$champs[$value2['champname']] = $value2['champname'];
 				        }
 				        unset($key2, $value2);
 				        array_unique($champs);
@@ -143,7 +144,7 @@
 											<td>
 												<table border='1'>";
 							foreach ($counters as $key3 => $value3) {
-								if(strcmp($value3[champname], $value2)==0){
+								if(strcmp($value3['champname'], $value2)==0){
 									echo "			<tr>
 														<td><div style='color:white'>$value3[countername]</div></td>
 													</tr>";
