@@ -6,6 +6,10 @@
 	}
 
 	//summonerIDs
+
+	if (!($_GET['summonerID']==NULL)) {
+		$summonerId = array("summoner" => $_GET['summonerID']);
+	}else{
 	$summonerId = array(
 	    "biberman"	=> "40023404",
 	    "lupusius"	=> "38527580",
@@ -14,7 +18,8 @@
 		"tomotx"	=> "41739529",
 	    "viper6"	=> "38598275"
 	    );
-	
+	}
+
 	//matchHistories
 	foreach ($summonerId as $key => $value) {
 		//get db matchHistory
