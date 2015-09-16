@@ -55,6 +55,35 @@
 			}
 		}
 	}
+
+	function summonerIdToSummonerName($in)
+	{
+		switch ($in) {
+			case '40023404':
+				$out="Biberman";
+				break;
+			case '38527580':
+				$out="Lupusius";
+				break;
+			case '40105796':
+				$out="Lurchi09";
+				break;
+			case '39999855':
+				$out="Oglie";
+				break;
+			case '41739529':
+				$out="TomotX";
+				break;
+			case '38598275':
+				$out="Viper6";
+				break;
+			
+			default:
+				$out="Unknown";
+				break;
+		}
+		return $out;
+	}
 ?>
 
 
@@ -167,10 +196,98 @@
 				';
 			}
 			echo '</tr></table>';
+		?>
+	</div>
+	<div id="teamOverview">
+		<?
+			$team = array();
+			if($result = $mysqli->query("SELECT * FROM teamInfo")){
+				while ($row = $result->fetch_assoc()) {
+					$team = $row;
+				}
+				unset($row);
+	        	$result->close();
+	        }
+			$history = array();
+			if($result = $mysqli->query("SELECT * FROM teamMatchHistory WHERE mapId=10 ORDER BY creation DESC LIMIT 10")){
+				while ($row = $result->fetch_assoc()) {
+					$history[] = $row;
+				}
+				unset($row);
+	        	$result->close();
+	        }
+	        
+			echo '<table>
+					<tr>
+						<td colspan="3">
+							<center><b>3vs3</center>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<img src="/icons/'.$team['league'].'.png" width="80" hight="80">
+						</td>
+						<td>
+							<img src="/icons/'.$team['division'].'.png" width="40" hight="40">
+						</td>
+						<td>
+							'.$team['points'].'
+						</td>
+					</tr>
+					<tr>
+						<td colspan="3">
+			';
+			foreach ($history as $key => $value) {
+				
+				$summonerWithChamp = array();
+				if($result = $mysqli->query('SELECT summonerID,champ FROM matchHistory WHERE matchID='.$value['matchID'].' AND queueType="RANKED_TEAM_3x3"')){
+					while ($row = $result->fetch_assoc()) {
+						$summonerWithChamp[] = $row;
+					}
+					unset($row);
+		        	$result->close();
+		        }
+		        //print_r($summonerWithChamp);
 
-			//MySQLi disconnection
-			$mysqli->close();
+				echo '		<table bgcolor="'.($value['win'] == '1' ? "green" : "FireBrick").'" width="220px">
+								<tr>
+									<td>
+										'.time_elapsed_string(unixTimeToSeconds($value['creation'])).'
+									</td>
+									<td>
+										<center><b><font color="white">'.$value['kills'].' </font>|<font color="white"> '.$value['deaths'].' </font>|<font color="white"> '.$value['assists'].'</font></b></center>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<table>
+											<tr>
+												<td width="65px">
+													<img src="icons/'.summonerIdToSummonerName($summonerWithChamp[0]['summonerID']).'Icon.png" width="20" hight="45"><img src="http://ddragon.leagueoflegends.com/cdn/5.15.1/img/champion/'.champIdToChampName($summonerWithChamp[0]['champ']).'.png" width="45" hight="45">
+												</td>
+												<td width="65px">
+													<img src="icons/'.summonerIdToSummonerName($summonerWithChamp[1]['summonerID']).'Icon.png" width="20" hight="45"><img src="http://ddragon.leagueoflegends.com/cdn/5.15.1/img/champion/'.champIdToChampName($summonerWithChamp[1]['champ']).'.png" width="45" hight="45">
+												</td>
+												<td width="65px">
+													<img src="icons/'.summonerIdToSummonerName($summonerWithChamp[2]['summonerID']).'Icon.png" width="20" hight="45"><img src="http://ddragon.leagueoflegends.com/cdn/5.15.1/img/champion/'.champIdToChampName($summonerWithChamp[2]['champ']).'.png" width="45" hight="45">
+												</td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+							</table>
+				';
+			}
+			echo '		</td>
+					</tr>
+				</table>
+			';
 		?>
 	</div>
 </body>
 </html>
+
+<?
+	//MySQLi disconnection
+	$mysqli->close();
+?>
