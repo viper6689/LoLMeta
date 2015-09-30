@@ -72,7 +72,6 @@
 				)
 				ON DUPLICATE KEY UPDATE
 					playerOrTeamName	=	VALUES(playerOrTeamName),
-					queue 				=	VALUES(queue),
 					tier 				= 	VALUES(tier),
 					name 				= 	VALUES(name),
 					division 			= 	VALUES(division),
