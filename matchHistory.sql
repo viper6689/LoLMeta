@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 01, 2015 at 05:15 PM
+-- Generation Time: Oct 05, 2015 at 05:14 PM
 -- Server version: 5.5.42-cll
 -- PHP Version: 5.4.31
 
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `matchlist` (
   `matchId` int(10) unsigned DEFAULT NULL,
   `summonerId` int(8) unsigned DEFAULT NULL,
   `queue` set('RANKED_SOLO_5x5','RANKED_TEAM_3x3','RANKED_TEAM_5x5') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'RANKED_SOLO_5x5',
-  `champion` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `champion` smallint(3) unsigned NOT NULL DEFAULT '0',
   `lane` set('MID','MIDDLE','TOP','JUNGLE','BOT','BOTTOM') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'TOP',
   `role` set('DUO','NONE','SOLO','DUO_CARRY','DUO_SUPPORT') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'NONE',
   `timestamp` bigint(13) unsigned NOT NULL DEFAULT '0',
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `matchParticipants` (
   `matchId` int(10) unsigned DEFAULT NULL,
   `summonerId` int(8) unsigned DEFAULT NULL,
   `winner` tinyint(1) NOT NULL DEFAULT '0',
-  `championId` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `championId` smallint(3) unsigned NOT NULL DEFAULT '0',
   `kills` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `deaths` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `assists` tinyint(3) unsigned NOT NULL DEFAULT '0',
