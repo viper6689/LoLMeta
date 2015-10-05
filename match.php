@@ -33,9 +33,9 @@
     	$result->close();
     }
     unset($query);
-
+    
 	for ($i=0; $i<5 ; $i++) { //wegen Abfragelimit auf 5 API-Requests per Aufruf beschraenkt
-		if (array_key_exists('matchId', $matchIds)) {
+		if (array_key_exists('matchId', $matchIds[$i])) {
 			//get JSON match-v2.2
 			$url =
 				'https://euw.api.pvp.net/api/lol/euw/v2.2/match/'
