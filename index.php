@@ -1,6 +1,6 @@
-<?	
+<?
 	//MySQLi connection
-	$mysqli = new mysqli('localhost', 'rclsirzj_lolmeta', 'LoLMeta42', 'rclsirzj_lolmeta');
+	$mysqli = new mysqli('localhost', 'rclsirzj_lolmeta', 'LoLMeta42', 'rclsirzj_meta');
 	if($mysqli->connect_errno > 0){
 	   	die('Unable to connect to database [' . $mysqli->connect_error . ']');
 	}
@@ -12,11 +12,12 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<title>LoLMeta</title>
 	<link rel="stylesheet" type="text/css" href="styles.css" />
-	<link rel="shortcut icon" href="/icons/favicon.ico" type="image/x-icon" />
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+	<link rel="icon" href="/favicon.ico" type="image/x-icon" />
 </head>
 <body>
 	<div id="misc">
-		<a href="/overview.php">Overview</a><br />
+		<a href="/site_matchHistory.php">Overview</a><br />
 		<a href="http://www.mobafire.com/profile/vercetty-627507/content/builds" target="_blank">Builds</a>
 	</div>
 
