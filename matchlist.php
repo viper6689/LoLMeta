@@ -22,38 +22,40 @@
 		$json = file_get_contents($url);
 		$obj = json_decode($json, true);
 
-		foreach ($obj['matches'] as $key => $value) {
-			$query = '
-				INSERT INTO matchlist (
-					matchId,
-					summonerId,
-					queue,
-					champion,
-					lane,
-					role,
-					timestamp,
-					season
-				)
-				VALUES (
-					'.$value['matchId'].',
-					'.$value0.',
-					"'.$value['queue'].'",
-					'.$value['champion'].',
-					"'.$value['lane'].'",
-					"'.$value['role'].'",
-					'.$value['timestamp'].',
-					"'.$value['season'].'"
-				)
-				ON DUPLICATE KEY UPDATE
-					queue 		=	VALUES(queue),
-					champion 	= 	VALUES(champion),
-					lane 		= 	VALUES(lane),
-					role 		= 	VALUES(role),
-					timestamp	= 	VALUES(timestamp),
-					season 		= 	VALUES(season)
-			';
-			$mysqli->query($query);
-			unset($query);
+		if(is_array($obj)) {
+			foreach ($obj['matches'] as $key => $value) {
+				$query = '
+					INSERT INTO matchlist (
+						matchId,
+						summonerId,
+						queue,
+						champion,
+						lane,
+						role,
+						timestamp,
+						season
+					)
+					VALUES (
+						'.$value['matchId'].',
+						'.$value0.',
+						"'.$value['queue'].'",
+						'.$value['champion'].',
+						"'.$value['lane'].'",
+						"'.$value['role'].'",
+						'.$value['timestamp'].',
+						"'.$value['season'].'"
+					)
+					ON DUPLICATE KEY UPDATE
+						queue 		=	VALUES(queue),
+						champion 	= 	VALUES(champion),
+						lane 		= 	VALUES(lane),
+						role 		= 	VALUES(role),
+						timestamp	= 	VALUES(timestamp),
+						season 		= 	VALUES(season)
+				';
+				$mysqli->query($query);
+				unset($query);
+			}
 		}
 		unset($url,$json,$obj);
 	}
