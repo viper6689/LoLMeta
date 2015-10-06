@@ -117,7 +117,7 @@
 									<img src="/icons/'.$summonerLeague['division'].'.png" width="40" hight="40">
 								</td>
 								<td>
-									'.$summonerLeague['leaguePoints'].'
+									<font size="6"><b>'.$summonerLeague['leaguePoints'].'</b></font>
 								</td>
 							</tr>
 							<tr>
