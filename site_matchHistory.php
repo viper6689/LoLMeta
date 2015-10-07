@@ -29,7 +29,8 @@
 			tier,
 			name,
 			division,
-			leaguePoints
+			leaguePoints,
+			seriesProgress
 		FROM league
 		WHERE queue = "RANKED_SOLO_5x5"
 		ORDER BY playerOrTeamName
@@ -117,7 +118,7 @@
 									<img src="/icons/'.$summonerLeague['division'].'.png" width="40" hight="40">
 								</td>
 								<td>
-									<font size="6"><b>'.$summonerLeague['leaguePoints'].'</b></font>
+									<font size="6"><b>'.leaguePointsOrSeries($summonerLeague).'</b></font>
 								</td>
 							</tr>
 							<tr>
@@ -217,6 +218,16 @@
 			if($value['key']==$in){
 				return $value['id'];
 			}
+		}
+	}
+
+	function leaguePointsOrSeries($summonerLeague)
+	{
+		if (is_null($summonerLeague['seriesProgress'])) {
+			return $summonerLeague['leaguePoints'];
+		}
+		else {
+			return '<img src="/icons/series_'.$summonerLeague['seriesProgress'].'.png" width="40" hight="40">';
 		}
 	}
 
