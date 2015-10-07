@@ -91,7 +91,7 @@
 			unset($query);
 
 			//falls in Promoserie
-			if(isset($value[0]['entries'][0]['miniSeries'])){
+			if(array_key_exists('miniSeries', $value['entries'][0])){
 				$query = '
 					INSERT INTO league (
 						playerOrTeamId,
