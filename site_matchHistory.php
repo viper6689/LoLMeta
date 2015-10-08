@@ -115,35 +115,38 @@
 							<tr>
 								<td colspan="4">
 			';
-			for ($history=0; $history < $maxHistoryEntries; $history++) {			
-				if ($historys[$history]['summonerId'] == $summonerLeague['playerOrTeamId']) {
+			$historyEntries = 0;
+			foreach ($historys as $key1 => $history) {
+				if ($history['summonerId'] == $summonerLeague['playerOrTeamId']) {
 					echo '		
-									<table bgcolor="'.($historys[$history]['win'] == 1 ? 'green' : 'firebrick').'" width="200px">
+									<table bgcolor="'.($history['win'] == 1 ? 'green' : 'firebrick').'" width="200px">
 										<tr>
 											<td colspan="3">
-												'.time_elapsed_string(unixTimeToSeconds($historys[$history]['matchCreation'])+$historys[$history]['matchDuration']).'
+												'.time_elapsed_string(unixTimeToSeconds($history['matchCreation'])+$history['matchDuration']).'
 											</td>
 										</tr>
 										<tr>
 											<td rowspan=2>
-												<img src="http://ddragon.leagueoflegends.com/cdn/5.15.1/img/champion/'.champIdToChampName($historys[$history]['championId'],$objDdragonChampions).'.png" width="45" hight="45">
+												<img src="http://ddragon.leagueoflegends.com/cdn/5.15.1/img/champion/'.champIdToChampName($history['championId'],$objDdragonChampions).'.png" width="45" hight="45">
 											</td>
 											<td rowspan=2>
-												<img src="/icons/lane_'.$historys[$history]['lane'].'.png" width="45" hight="45">
+												<img src="/icons/lane_'.$history['lane'].'.png" width="45" hight="45">
 											</td>
 											<td>
-												<center>'.gmdate("H:i:s", $historys[$history]['matchDuration']).'</center>
+												<center>'.gmdate("H:i:s", $history['matchDuration']).'</center>
 											</td>
 										</tr>
 										<tr>
 											<td>
-												<center><b><font color="white">'.$historys[$history]['kills'].' </font>|<font color="white"> '.$historys[$history]['deaths'].' </font>|<font color="white"> '.$historys[$history]['assists'].'</font></b></center>
+												<center><b><font color="white">'.$history['kills'].' </font>|<font color="white"> '.$history['deaths'].' </font>|<font color="white"> '.$history['assists'].'</font></b></center>
 											</td>
 										</tr>
 									</table>
 					';
+					if (++$historyEntries >= $maxHistoryEntries) break;
 				}
 			}
+			unset($historyEntries);
 			echo '				</td>
 							</tr>
 						</table>
