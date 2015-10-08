@@ -1,24 +1,17 @@
 <?
-	//MySQLi connection
+	//--- MySQLi connection ---
 	$mysqli = new mysqli('localhost', 'rclsirzj_lolmeta', 'LoLMeta42', 'rclsirzj_matchHistory');
 	if($mysqli->connect_errno > 0){
 	   	die('Unable to connect to database [' . $mysqli->connect_error . ']');
 	}
 
+
+	//--- Variables ---
 	$maxHistoryEntries = 10;
 
-	$ddragonChampionsUrl = "http://ddragon.leagueoflegends.com/cdn/5.19.1/data/en_US/champion.json";
-	$ddragonChampionsJson = file_get_contents($ddragonChampionsUrl);
-	$ddragonChampions = json_decode($ddragonChampionsJson, true);
-
-	$summonerIds = array(
-		'Biberman'	=> "40023404",
-	    'Lupusius'	=> "38527580",
-		'Lurchi09'	=> "40105796",
-		'Oglie'		=> "39999855",
-		'TomotX'	=> "41739529",
-	    'Viper6'	=> "38598275"
-	);
+	$urlDdragonChampions = 'http://ddragon.leagueoflegends.com/cdn/5.19.1/data/en_US/champion.json';
+	$jsonDdragonChampionsJson = file_get_contents($urlDdragonChampions);
+	$objDdragonChampions = json_decode($jsonDdragonChampionsJson,true);
 
 	//Ligainfos der SoloQue Spieler
 	$query = '
@@ -48,23 +41,21 @@
 	//MatchHistory der SoloQue Spieler
 	$query = '
 		SELECT
-			mp.matchId,
-			mp.summonerId,
-			mp.winner,
-			mp.championId,
-			mp.kills,
-			mp.deaths,
-			mp.assists,
+			sm.matchId,
+			sm.summonerId,
+			sm.championId,
+			sm.lane,
+			sm.win,
+			sm.kills,
+			sm.deaths,
+			sm.assists,
 			m.queueType,
 			m.matchCreation,
 			m.matchDuration,
-			m.season,
-			ml.lane
-		FROM matchParticipants mp
-			LEFT JOIN `match` m
-				ON m.matchId = mp.matchId
-			LEFT JOIN matchlist ml
-				ON ml.matchId = mp.matchId AND ml.summonerId = mp.summonerId
+			m.season
+		FROM summonerMatchstats sm
+			LEFT JOIN matches m
+				ON m.matchId = sm.matchId
 		WHERE m.queueType="RANKED_SOLO_5x5"
 		ORDER BY m.matchCreation DESC
 	';
@@ -98,7 +89,7 @@
 				<tr>
 		';
 
-        foreach ($summonerLeagues as $key1 => $summonerLeague) {
+        foreach ($summonerLeagues as $key0 => $summonerLeague) {
         	echo '
         			<td>	
 						<table>
@@ -124,35 +115,33 @@
 							<tr>
 								<td colspan="4">
 			';
-			$historyEntries = 0;
-			foreach ($historys as $key2 => $history) {
-				if ($historyEntries < $maxHistoryEntries && $history['summonerId'] == $summonerLeague['playerOrTeamId']) {
+			for ($history=0; $history < $maxHistoryEntries; $history++) {			
+				if ($historys[$history]['summonerId'] == $summonerLeague['playerOrTeamId']) {
 					echo '		
-									<table bgcolor="'.($history['winner'] == '1' ? "green" : "FireBrick").'" width="200px">
+									<table bgcolor="'.($historys[$history]['win'] == 1 ? 'green' : 'firebrick').'" width="200px">
 										<tr>
 											<td colspan="3">
-												'.time_elapsed_string(unixTimeToSeconds($history['matchCreation'])+$history['matchDuration']).'
+												'.time_elapsed_string(unixTimeToSeconds($historys[$history]['matchCreation'])+$historys[$history]['matchDuration']).'
 											</td>
 										</tr>
 										<tr>
 											<td rowspan=2>
-												<img src="http://ddragon.leagueoflegends.com/cdn/5.15.1/img/champion/'.champIdToChampName($history['championId'], $ddragonChampions).'.png" width="45" hight="45">
+												<img src="http://ddragon.leagueoflegends.com/cdn/5.15.1/img/champion/'.champIdToChampName($historys[$history]['championId'],$objDdragonChampions).'.png" width="45" hight="45">
 											</td>
 											<td rowspan=2>
-												<img src="/icons/lane_'.$history['lane'].'.png" width="45" hight="45">
+												<img src="/icons/lane_'.$historys[$history]['lane'].'.png" width="45" hight="45">
 											</td>
 											<td>
-												<center>'.gmdate("H:i:s", $history['matchDuration']).'</center>
+												<center>'.gmdate("H:i:s", $historys[$history]['matchDuration']).'</center>
 											</td>
 										</tr>
 										<tr>
 											<td>
-												<center><b><font color="white">'.$history['kills'].' </font>|<font color="white"> '.$history['deaths'].' </font>|<font color="white"> '.$history['assists'].'</font></b></center>
+												<center><b><font color="white">'.$historys[$history]['kills'].' </font>|<font color="white"> '.$historys[$history]['deaths'].' </font>|<font color="white"> '.$historys[$history]['assists'].'</font></b></center>
 											</td>
 										</tr>
 									</table>
 					';
-					$historyEntries++;
 				}
 			}
 			echo '				</td>
@@ -172,6 +161,7 @@
 </html>
 
 <?
+	//--- Functions ---
 	function time_elapsed_string($ptime)
 	{
 	    $etime = time() - $ptime;
@@ -231,6 +221,7 @@
 		}
 	}
 
-	//MySQLi disconnection
+
+	//--- MySQLi disconnection ---
 	$mysqli->close();
 ?>
