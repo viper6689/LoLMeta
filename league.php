@@ -24,7 +24,7 @@
 			.$playerOrTeamIds['Oglie'].','
 			.$playerOrTeamIds['TomotX'].','
 			.$playerOrTeamIds['Viper6'].
-		'/entry?api_key=92d4e772-44cf-4bc8-9782-236d2c18fcc0';
+		'/entry?api_key=a964ed63-f501-4f5e-9d16-d7e90b0048e2';
 	$json = file_get_contents($url);
 	$obj = json_decode($json, true);
 
