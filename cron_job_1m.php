@@ -15,12 +15,15 @@
    	$result->close();
 
     switch ($globaleVar['globeVar']) {
-    	case '1':
+    	case 1:
     		$cronUrl = 'http://lolmeta.serverlux.me/getJson_matchlist.php';
     		break;
-    	case '2':
-    		$cronUrl = 'http://lolmeta.serverlux.me/getJson_match.php';
-    		break;
+    	case 2:
+            $cronUrl = 'http://lolmeta.serverlux.me/getJson_match.php';
+            break;
+        case 3:
+            $cronUrl = 'http://lolmeta.serverlux.me/getJson_team.php';
+            break;
 
     	default:
     		$cronUrl = NULL;
@@ -31,7 +34,7 @@
     //--- Methodes ---
     echo curl($cronUrl);
 
-    if ($globaleVar['globeVar'] > 1) {
+    if ($globaleVar['globeVar'] > 2) {
     	$mysqli->query('UPDATE dbVar SET globeVar = 1');
     } else {
     	$mysqli->query('UPDATE dbVar SET globeVar = globeVar+1');	
