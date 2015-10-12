@@ -1,10 +1,13 @@
 <?
-	//MySQLi connection
+	//--- MySQLi connection ---
 	$mysqli = new mysqli('localhost', 'rclsirzj_lolmeta', 'LoLMeta42', 'rclsirzj_matchHistory');
 	if($mysqli->connect_errno > 0){
 	   	die('Unable to connect to database [' . $mysqli->connect_error . ']');
 	}
 
+
+	//--- Variables ---
+	$apikey = 'a964ed63-f501-4f5e-9d16-d7e90b0048e2';
 	$playerOrTeamIds = array(
 		'Biberman'	=> "40023404",
 	    'Lupusius'	=> "38527580",
@@ -16,21 +19,22 @@
 	    'Allerbesten'		=> "TEAM-ccee0980-5e43-11e5-8042-c81f66dd32cd");
 	
 	//get JSON league-v2.5
-	$url =
+	$urlLeague =
 		'https://euw.api.pvp.net/api/lol/euw/v2.5/league/by-summoner/'
 			.$playerOrTeamIds['Biberman'].','
 			.$playerOrTeamIds['Lupusius'].','
 			.$playerOrTeamIds['Lurchi09'].','
 			.$playerOrTeamIds['Oglie'].','
 			.$playerOrTeamIds['TomotX'].','
-			.$playerOrTeamIds['Viper6'].
-		'/entry?api_key=a964ed63-f501-4f5e-9d16-d7e90b0048e2';
-	$json = file_get_contents($url);
-	$obj = json_decode($json, true);
+			.$playerOrTeamIds['Viper6'].'/entry?api_key='
+			.$apikey;
+	$jsonLeague = file_get_contents($urlLeague);
+	$objLeague = json_decode($jsonLeague,true);
 
-	//insert into DB matchHistory
-	foreach ($obj as $key0 => $value0) {
-		foreach ($value0 as $key => $value) {		
+
+	//--- Methodes ---
+	foreach ($objLeague as $key0 => $leagues) {
+		foreach ($leagues as $key1 => $league) {		
 			$query = '
 				INSERT INTO league (
 					playerOrTeamId,
@@ -52,74 +56,65 @@
 					seriesProgress
 				)
 				VALUES (
-					"'.$value['entries'][0]['playerOrTeamId'].'",
-					"'.$value['entries'][0]['playerOrTeamName'].'",
-					"'.$value['queue'].'",
-					"'.$value['tier'].'",
-					"'.$value['name'].'",
-					"'.$value['entries'][0]['division'].'",
-					'.$value['entries'][0]['leaguePoints'].',
-					'.$value['entries'][0]['wins'].',
-					'.$value['entries'][0]['losses'].',
-					'.($value['entries'][0]['isHotStreak']>0?1:0).',
-					'.($value['entries'][0]['isFreshBlood']>0?1:0).',
-					'.($value['entries'][0]['isVeteran']>0?1:0).',
-					'.($value['entries'][0]['isInactive']>0?1:0).',
-					NULL,
-					NULL,
-					NULL,
-					NULL
+					"'.$league['entries'][0]['playerOrTeamId'].'",
+					"'.$league['entries'][0]['playerOrTeamName'].'",
+					"'.$league['queue'].'",
+					"'.$league['tier'].'",
+					"'.$league['name'].'",
+					"'.$league['entries'][0]['division'].'",
+					'.$league['entries'][0]['leaguePoints'].',
+					'.$league['entries'][0]['wins'].',
+					'.$league['entries'][0]['losses'].',
+					'.($league['entries'][0]['isHotStreak']>0?1:0).',
+					'.($league['entries'][0]['isFreshBlood']>0?1:0).',
+					'.($league['entries'][0]['isVeteran']>0?1:0).',
+					'.($league['entries'][0]['isInactive']>0?1:0).',
+			';
+			//Fallunterscheidung: in Promoserie?
+			if(array_key_exists('miniSeries', $league['entries'][0])) {
+				$query .= '
+						'.$league['entries'][0]['miniSeries']['wins'].',
+						'.$league['entries'][0]['miniSeries']['losses'].',
+						'.$league['entries'][0]['miniSeries']['target'].',
+						"'.$league['entries'][0]['miniSeries']['progress'].'"
+				';
+			} else {
+				$query .= '
+						NULL,
+						NULL,
+						NULL,
+						NULL
+				';
+			}
+			$query .= '
 				)
 				ON DUPLICATE KEY UPDATE
-					playerOrTeamName	=	VALUES(playerOrTeamName),
-					tier 				= 	VALUES(tier),
-					name 				= 	VALUES(name),
-					division 			= 	VALUES(division),
-					leaguePoints 		= 	VALUES(leaguePoints),
-					wins 				= 	VALUES(wins),
-					losses 				= 	VALUES(losses),
-					isHotStreak 		= 	VALUES(isHotStreak),
-					isFreshBlood 		= 	VALUES(isFreshBlood),
-					isVeteran 			= 	VALUES(isVeteran),
-					isInactive 			= 	VALUES(isInactive),
-					seriesWins 			= 	VALUES(seriesWins),
-					seriesLosses 		= 	VALUES(seriesLosses),
-					seriesTarget 		= 	VALUES(seriesTarget),
-					seriesProgress 		= 	VALUES(seriesProgress)
+					playerOrTeamId 		= VALUES(playerOrTeamId),
+					playerOrTeamName	= VALUES(playerOrTeamName),
+					queue 				= VALUES(queue),
+					tier 				= VALUES(tier),
+					name 				= VALUES(name),
+					division 			= VALUES(division),
+					leaguePoints 		= VALUES(leaguePoints),
+					wins 				= VALUES(wins),
+					losses 				= VALUES(losses),
+					isHotStreak 		= VALUES(isHotStreak),
+					isFreshBlood 		= VALUES(isFreshBlood),
+					isVeteran 			= VALUES(isVeteran),
+					isInactive 			= VALUES(isInactive),
+					seriesWins 			= VALUES(seriesWins),
+					seriesLosses 		= VALUES(seriesLosses),
+					seriesTarget 		= VALUES(seriesTarget),
+					seriesProgress 		= VALUES(seriesProgress)
 			';
+			print $query;
 			$mysqli->query($query);
 			unset($query);
-
-			//falls in Promoserie
-			if(array_key_exists('miniSeries', $value['entries'][0])){
-				$query = '
-					INSERT INTO league (
-						playerOrTeamId,
-						seriesWins,
-						seriesLosses,
-						seriesTarget,
-						seriesProgress
-					)
-					VALUES (
-						"'.$value['entries'][0]['playerOrTeamId'].'",
-						'.$value['entries'][0]['miniSeries']['wins'].',
-						'.$value['entries'][0]['miniSeries']['losses'].',
-						'.$value['entries'][0]['miniSeries']['target'].',
-						"'.$value['entries'][0]['miniSeries']['progress'].'"
-					)
-					ON DUPLICATE KEY UPDATE
-						seriesWins 		= 	VALUES(seriesWins),
-						seriesLosses 	= 	VALUES(seriesLosses),
-						seriesTarget 	= 	VALUES(seriesTarget),
-						seriesProgress 	= 	VALUES(seriesProgress)
-				';
-				$mysqli->query($query);
-				unset($query);
-			}
 		}
 	}
-	unset($url,$json,$obj);
+	unset($urlLeague,$jsonLeague,$objLeague);
 
-	//MySQLi disconnection
+
+	//--- MySQLi disconnection ---
 	$mysqli->close();
 ?>
