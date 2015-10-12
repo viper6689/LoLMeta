@@ -147,35 +147,37 @@
         			<td>	
 						<table>
 							<tr>
-								<td colspan="4">
-									<center><b>'.$summonerLeague['playerOrTeamName'].'</b></center>
+								<td  style="text-align:center; font-weight:bold; font-size:1.5em">
+									'.$summonerLeague['playerOrTeamName'].'
+								</td>
+							</tr>
+							<tr>
+								<td style="text-align:center">
+									<img src="/icons/'.$summonerLeague['playerOrTeamName'].'Icon.png" width="20" hight="45" style="vertical-align:middle">
+									<img src="/icons/'.$summonerLeague['tier'].'.png" width="60" hight="60" style="vertical-align:middle">
+									<img src="/icons/'.$summonerLeague['division'].'.png" width="40" hight="40" style="vertical-align:middle">
+									<span style="font-size:2em; font-weight:bold; vertical-align:middle">'.leaguePointsOrSeries($summonerLeague).'</span>
 								</td>
 							</tr>
 							<tr>
 								<td>
-									<img src="/icons/'.$summonerLeague['playerOrTeamName'].'Icon.png" width="20" hight="45">
-								</td>
-								<td>
-									<img src="/icons/'.$summonerLeague['tier'].'.png" width="80" hight="80">
-								</td>
-								<td>
-									<img src="/icons/'.$summonerLeague['division'].'.png" width="40" hight="40">
-								</td>
-								<td>
-									<font size="6"><b>'.leaguePointsOrSeries($summonerLeague).'</b></font>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="4">
 			';
 			$historyEntries = 0;
 			foreach ($historys as $key1 => $history) {
 				if ($history['summonerId'] == $summonerLeague['playerOrTeamId'] && $history['queueType'] == 'RANKED_SOLO_5x5') {
 					echo '		
-									<table bgcolor="'.($history['win']==1?'green':'firebrick').'" width="200px">
+									<table style="width:200px; border:1px solid black; background-color:'.($history['win']==1?'forestgreen':'firebrick').'">
 										<tr>
-											<td colspan="3">
+											<td colspan="2">
 												'.time_elapsed_string(unixTimeToSeconds($history['matchCreation'])+$history['matchDuration']).'
+											</td>
+											<td style="text-align:center; font-weight:bold; color:white; text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black">
+												<img src="/icons/KillIcon.png" width="12" hight="12">'
+												.$history['kills'].
+												' <img src="/icons/DeathIcon.png" width="12" hight="12">'
+												.$history['deaths'].
+												' <img src="/icons/AssistIcon.png" width="12" hight="12">'
+												.$history['assists'].'
 											</td>
 										</tr>
 										<tr>
@@ -185,13 +187,14 @@
 											<td rowspan=2>
 												<img src="/icons/lane_'.laneWithRole($history).'.png" width="45" hight="45">
 											</td>
-											<td>
-												<center>'.gmdate("H:i:s", $history['matchDuration']).'</center>
+											<td style="text-align:center">
+												'.queueType($historys,$history).'
 											</td>
 										</tr>
 										<tr>
-											<td>
-												<center><b><font color="white">'.$history['kills'].' </font>|<font color="white"> '.$history['deaths'].' </font>|<font color="white"> '.$history['assists'].'</font></b></center>
+											<td style="text-align:right">
+												<img src="/icons/ClockIcon.png" width="15" hight="15">'
+												.matchDurationFormat($history['matchDuration']).'
 											</td>
 										</tr>
 									</table>
@@ -225,22 +228,16 @@
         			<td>	
 						<table>
 							<tr>
-								<td colspan="4">
-									<center><b>'.$team3League['playerOrTeamName'].'</b></center>
+								<td  style="text-align:center; font-weight:bold; font-size:1.5em">
+									'.$team3League['playerOrTeamName'].'
 								</td>
 							</tr>
 							<tr>
-								<td>
-									<img src="/icons/'.($team3League['queue']=='RANKED_TEAM_3x3'?'3v3':'5v5').'Icon.png" width="20" hight="45">
-								</td>
-								<td>
-									<img src="/icons/'.$team3League['tier'].'.png" width="80" hight="80">
-								</td>
-								<td>
-									<img src="/icons/'.$team3League['division'].'.png" width="40" hight="40">
-								</td>
-								<td>
-									<font size="6"><b>'.leaguePointsOrSeries($team3League).'</b></font>
+								<td style="text-align:center">
+									<img src="/icons/'.($team3League['queue']=='RANKED_TEAM_3x3'?'3v3':'5v5').'Icon.png" width="20" hight="45" style="vertical-align:middle">
+									<img src="/icons/'.$team3League['tier'].'.png" width="60" hight="60" style="vertical-align:middle">
+									<img src="/icons/'.$team3League['division'].'.png" width="40" hight="40" style="vertical-align:middle">
+									<span style="font-size:2em; font-weight:bold; vertical-align:middle">'.leaguePointsOrSeries($team3League).'</span>
 								</td>
 							</tr>
 							<tr>
@@ -265,8 +262,13 @@
 											<td>
 												'.time_elapsed_string(unixTimeToSeconds($teamHistory['matchCreation'])+$teamHistory['matchDuration']).'
 											</td>
-											<td>
-												<center><b><font color="white">'.$teamHistory['kills'].' </font>|<font color="white"> '.$teamHistory['deaths'].' </font>|<font color="white"> '.$teamHistory['assists'].'</font></b></center>
+											<td style="text-align:center; font-weight:bold; color:white; text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black">
+												<img src="/icons/KillIcon.png" width="12" hight="12">'
+												.$teamHistory['kills'].
+												' <img src="/icons/DeathIcon.png" width="12" hight="12">'
+												.$teamHistory['deaths'].
+												' <img src="/icons/AssistIcon.png" width="12" hight="12">'
+												.$teamHistory['assists'].'
 											</td>
 										</tr>
 										<tr>
@@ -349,6 +351,14 @@
 	{
 		return round($in/1000);
 	}
+
+	function matchDurationFormat($in)
+	{
+		$seconds 	= $in % 60;
+		$minutes 	= floor(($in / 60) % 60);
+		$hours 	 	= floor($in / 3600);
+		return ($hours>0 ? $hours.'h ' : '').$minutes.'m '.$seconds.'s';
+	}
 	
 	function champIdToChampName($in, $ddragonChampions)
 	{
@@ -406,6 +416,16 @@
 				break;
 		}
 		return $out;
+	}
+
+	function queueType($histories,$history)
+	{
+		foreach ($histories as $key => $partner) {
+			if ($partner['matchId'] == $history['matchId'] && $partner['summonerId'] != $history['summonerId']) {
+				return '<img src="/icons/DuoQueue.png" width="15" hight="15">'.summonerIdToSummonerName($partner['summonerId']);
+			}
+		}
+		return '<img src="/icons/SoloQueue.png" width="15" hight="15">';
 	}
 
 
